@@ -16,6 +16,28 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `exam_2`
+--
+
+DROP TABLE IF EXISTS `exam_2`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `exam_2` (
+  `id` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `exam_2`
+--
+
+LOCK TABLES `exam_2` WRITE;
+/*!40000 ALTER TABLE `exam_2` DISABLE KEYS */;
+INSERT INTO `exam_2` VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9);
+/*!40000 ALTER TABLE `exam_2` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Dumping events for database 'exam_2'
 --
 
@@ -32,4 +54,4 @@
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-09-29 19:27:07
+-- Dump completed on 2026-09-29 19:45:45
