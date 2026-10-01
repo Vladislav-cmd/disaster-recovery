@@ -82,7 +82,7 @@ mysql_restore() {
                 service mysql restart
 
                 #Копируем файлы табличных бэкапов и crontab
-                cp -r /root/disaster-recovery/scripts/* /root
+                cp -r /root/disaster-recovery/scripts/{crontab,tables_bcp.sh} /root
                 #Заменяем на наш crontab файл с запуском скрипта потабличного бекапа баз раз в сутки в 3 ночи
                 cp /root/crontab /etc/crontab
                 rm -rf /root/disaster-recovery
@@ -108,28 +108,25 @@ monitoring_restore() {
 #_________________________________________________________________________________________________________________
 elk_restore() {
         cd /root
-        #Распаковка и установка №1 Elasticsearch
-        #dpkg -i elasticsearch_8.17.1-amd64.deb
+        #Установка №1 Elasticsearch
         cp /root/disaster-recovery/elk/elasticsearch_cfg/jvm.options /etc/elasticsearch/jvm.options.d/
         cp /root/disaster-recovery/elk/elasticsearch_cfg/elasticsearch.yml /etc/elasticsearch/
         systemctl daemon-reload
         systemctl enable --now elasticsearch.service
 
-        #Распаковка и установка №2 Kibana
-        #dpkg -i kibana_8.17.1_amd64.deb
+        #Установка №2 Kibana
         systemctl daemon-reload
         systemctl enable --now kibana.service
         cp /root/disaster-recovery/elk/kibana_cfg/kibana.yml /etc/kibana/
         systemctl restart kibana
 
-        #Распаковка и установка №3 Logstash
-        #dpkg -i logstash_8.17.1_amd64.deb
+        #Установка №3 Logstash
         systemctl enable --now logstash.service
         cp /root/disaster-recovery/elk/logstash_cfg/logstash.yml /etc/logstash/
         cp /root/disaster-recovery/elk/logstash_cfg/logstash-nginx-es.conf /etc/logstash/conf.d/
         systemctl restart logstash.service
 
-        #Распаковка и установка №4 Filebeat
+        #Установка №4 Filebeat
         #dpkg -i filebeat_8.17.1_amd64.deb
         cp /root/disaster-recovery/elk/filebeat_cfg/filebeat.yml /etc/filebeat/
         systemctl restart filebeat
