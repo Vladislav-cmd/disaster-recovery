@@ -33,7 +33,7 @@ web_restore() {
         cd /root/disaster-recovery
         #Копируем готовые файлы в целевые директории
         cp -r nginx apache2 /etc/
-        cp -r /web/* /var/www/
+        cp -r /root/disaster-recovery/web/{html,html1,html2} /var/www/
         #Выполняем рестарт сервисом для включения новой конфигурации
         service nginx restart
         service apache2 restart
