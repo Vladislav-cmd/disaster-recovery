@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -x
+#set -x
 #set -Eeuo pipefail
 
 #_________________________________________________________________________________________________________________
@@ -33,7 +33,7 @@ web_restore() {
         cd /root/disaster-recovery
         #Копируем готовые файлы в целевые директории
         cp -r nginx apache2 /etc/
-        cp -r html html1 html2 /var/www/
+        cp -r /web/* /var/www/
         #Выполняем рестарт сервисом для включения новой конфигурации
         service nginx restart
         service apache2 restart
@@ -44,19 +44,19 @@ mysql_restore() {
         rm /etc/mysql/mysql.conf.d/mysqld.cnf
 
         #Копируем конфигурационный файл
-        cp /root/disaster-recovery/mysql_cfg_bcp/master_node/mysqld.cnf /etc/mysql/mysql.conf.d/
+        cp /root/disaster-recovery/mysql/mysql_cfg_bcp/master_node/mysqld.cnf /etc/mysql/mysql.conf.d/
         service mysql restart
 
         mysql -e "CREATE USER repl@'%' IDENTIFIED WITH 'caching_sha2_password' BY 'repltest';"
         mysql -e "GRANT REPLICATION SLAVE ON *.* TO repl@'%';"
 
         #Восстанавливаем БД
-        cd /root/disaster-recovery/mysql_db_backup/
+        cd /root/disaster-recovery/mysql/mysql_db_backup/
         #Получаем список из БД, предварительно отпарсив только название
                 #-exec ... {} \; — выполняет указанную команду для каждого найденного файла.
                 #basename — утилита, которая отсекает весь путь, оставляя только имя файла.
                 #-s .sql — суффикс (расширение), который basename автоматически удалит с конца имени.
-        db_list=$(find /root/disaster-recovery/mysql_db_backup/ -name "*.sql" -exec basename -s .sql {} \;)
+        db_list=$(find /root/disaster-recovery/mysql/mysql_db_backup/ -name "*.sql" -exec basename -s .sql {} \;)
 
         for db in $db_list
         do
@@ -65,8 +65,6 @@ mysql_restore() {
                 #Заливаем файл.sql в созданную БД
                 mysql -u root $db < $db.sql
         done
-
-        #rm -rf /root/disaster-recovery
 
         #Восстановление для реплики - надо подключаться по ssh (уже зараннее настроена авторизация по ключу для root'a)
         #-o StrictHostKeyChecking=no   - чтобы при первом подключении не нужно было вводить yes
@@ -78,7 +76,7 @@ mysql_restore() {
                 git clone git@github.com:Vladislav-cmd/disaster-recovery.git
 
                 rm /etc/mysql/mysql.conf.d/mysqld.cnf
-                cp /root/disaster-recovery/mysql_cfg_bcp/replica_node/mysqld.cnf /etc/mysql/mysql.conf.d/
+                cp /root/disaster-recovery/mysql/mysql_cfg_bcp/replica_node/mysqld.cnf /etc/mysql/mysql.conf.d/
                 service mysql restart
 
                 #Копируем файлы табличных бэкапов и crontab
@@ -173,11 +171,4 @@ else
                 exit 2
         fi
 fi
-#_________________________________________________________________________________________________________________#Блок запуска функций:
-# 1) Функция, которая скачивает с git репозитория все бэкапы в директорию disaster-recovery
-#clone_bcp
-# 2) #Функция восстановления конфигурации nginx & apache2
-#web_restore
-# 3) #Функция восстановления Master-Slave MySQL, восстановления БД'ых и запуска потабличного бэкапа с реплики через crontab
-#mysql_restore
 #_________________________________________________________________________________________________________________
